@@ -11,20 +11,51 @@ SJSL::JobSystem::JobSystem()
 }
 
 SJSL::JobSystem::JobSystem(uint32_t nrOfWorkerThreads, bool isMainThreadWorker = false)
-	: m_AmountOfWorkers{ nrOfWorkerThreads }, m_WorkerThreads{}, m_IsMainThreadWorker{ isMainThreadWorker }
+	: m_AmountOfWorkers{ nrOfWorkerThreads }
+	, m_WorkerThreads{}
+	, m_IsMainThreadWorker{ isMainThreadWorker }
+	, m_AssignCounter{ 0 }
 {
 	InitializeWorkerThreads();
 }
 
 SJSL::JobSystem::~JobSystem()
 {
+
+	//for (WorkerThread* thread : m_WorkerThreads) {
+	//	thread->Join();
+	//}
+
+	for (WorkerThread* thread : m_WorkerThreads) {
+		delete thread;
+	}
 }
 
 void SJSL::JobSystem::InitializeWorkerThreads() {
-
-	std::fill(m_WorkerThreads.begin(), m_WorkerThreads.end(), new WorkerThread());
+	
+	m_WorkerThreads.reserve(m_AmountOfWorkers);
+	
+	for (size_t i = 0; i < m_AmountOfWorkers; i++)
+	{
+		m_WorkerThreads.emplace_back(new WorkerThread());
+	}
 }
 
-void SJSL::JobSystem::Schedule() {
+/*
+* Schedules a job by passing the work to a free workerthread
+*/
+void SJSL::JobSystem::Schedule(std::function<void()> job) {
+
+	m_WorkerThreads[m_AssignCounter]->Assign(job);
+	m_AssignCounter++;
+
+	if (m_AssignCounter > m_AmountOfWorkers - 1)
+		m_AssignCounter = 0;
+
+}
+
+uint32_t SJSL::JobSystem::GetAmountOfWorkerThreads() {
+
+	return m_AmountOfWorkers;
 
 }

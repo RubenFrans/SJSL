@@ -8,3 +8,4 @@ add_library(SJSLib
 
 # Set language standard
 set_property(TARGET SJSLib PROPERTY CXX_STANDARD 17)
+set(SJSLIncDir PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)

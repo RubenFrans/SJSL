@@ -1,5 +1,8 @@
 #pragma once
 #include <list>
+#include <functional>
+#include <thread>
+#include <mutex>
 
 namespace SJSL {
 
@@ -13,21 +16,36 @@ namespace SJSL {
 	{
 
 	public:
-		WorkerThread() = default;
-		virtual ~WorkerThread() = default;
+		
+		WorkerThread();
+		virtual ~WorkerThread();
 
 		WorkerThread(const WorkerThread&) = delete; // Copy constructor
 		WorkerThread(WorkerThread&&) = delete; // Move constructor
 		WorkerThread& operator=(const WorkerThread&) = delete; // Copy assignment
 		WorkerThread& operator=(const WorkerThread&&) = delete; // Move assignment
 
+		void Assign(std::function<void()> job, bool isLocalJob = true); // Assign a job to the worker thread
+		void Join();
 
-		void Assign(); // Assign a job to the worker thread
+		int GetAmountOfLocalJobs();
+		int GetAmountOfGlobalJobs();
 
 	private:
+
+		void ProcessJobs();
+
 		WorkerStatus m_WorkerStatus;
-		std::list<int> m_LocalJobs; // Other workers CANNOT steal from this list
-		std::list<int> m_GlobalJobs; // Other workers can steal from this list to improve load ballancing
+		std::list<std::function<void()>> m_LocalJobs; // Other workers CANNOT steal from this list
+		std::list<std::function<void()>> m_GlobalJobs; // Other workers can steal from this list to improve load ballancing
+
+		bool m_KillWorkerThread;
+
+		std::thread m_JobThread;
+		std::mutex m_LocalJobMutex;
+		std::mutex m_GlobalJobMutex;
+		std::condition_variable m_ProcessJobsCondition;
+		std::condition_variable m_KillThreadCondition;
 
 	};
 }
