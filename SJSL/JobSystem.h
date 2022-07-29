@@ -1,3 +1,12 @@
+/*
+* SJSL::JobSystem
+* This class is the main interface for the SJSL library. 
+* The JobSystem class' responsibilities are:
+*	Initializing and managing lifetime worker threads.
+*	Scheduling jobs by assigning them to worker threads.
+*	Basic loadbalancing by assigning jobs to worker threads that have less work.
+* 
+*/
 #pragma once
 
 #include <vector>

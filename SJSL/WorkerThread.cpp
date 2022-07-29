@@ -10,18 +10,26 @@ SJSL::WorkerThread::WorkerThread()
 	m_JobThread = std::thread(&WorkerThread::ProcessJobs, this);
 }
 
+/*
+* If a workerthread is destroyed before being joined automatically join it
+*/
 SJSL::WorkerThread::~WorkerThread() {
 
 	if(m_JobThread.joinable())
 		Join();
 }
 
+/*
+* Before joining the worker thread we make sure all it's jobs are finished
+* This makes sure no work is abandoned when the jobsystem is terminated prematurely (happens in small unit tests or applications)
+* Future implementation should have jobs that are interuptable.
+*/
 void SJSL::WorkerThread::Join() {
 
-	std::unique_lock joinLock{ m_GlobalJobMutex };
-	m_KillThreadCondition.wait(joinLock, [&]() {
+	std::unique_lock joinLock{ m_JoinThreadMutex };
+	m_JoinThreadCondition.wait(joinLock, [&]() {
 
-		return m_LocalJobs.size() == 0;
+		return m_LocalJobs.empty();
 
 		});
 
@@ -44,7 +52,7 @@ void SJSL::WorkerThread::Assign(std::function<void()> job, bool isLocalJob) {
 	m_ProcessJobsCondition.notify_all();
 
 	// Notify that the thread can't be killed because there are jobs in the local queue
-	m_KillThreadCondition.notify_all();
+	m_JoinThreadCondition.notify_all();
 }
 
 
@@ -78,7 +86,7 @@ void SJSL::WorkerThread::ProcessJobs() {
 
 		// If local jobs are exausted notify that the thread can be killed
 		if (m_LocalJobs.empty())
-			m_KillThreadCondition.notify_all();
+			m_JoinThreadCondition.notify_all();
 		
 		// Unlock before start executing the job
 		localLock.unlock();

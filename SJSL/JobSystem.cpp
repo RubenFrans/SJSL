@@ -1,4 +1,3 @@
-
 #include "JobSystem.h"
 #include "WorkerThread.h"
 #include <thread>
@@ -21,13 +20,8 @@ SJSL::JobSystem::JobSystem(uint32_t nrOfWorkerThreads, bool isMainThreadWorker =
 
 SJSL::JobSystem::~JobSystem()
 {
-
-	//for (WorkerThread* thread : m_WorkerThreads) {
-	//	thread->Join();
-	//}
-
-	for (WorkerThread* thread : m_WorkerThreads) {
-		delete thread;
+	for (WorkerThread* worker : m_WorkerThreads) {
+		delete worker;
 	}
 }
 
@@ -42,7 +36,11 @@ void SJSL::JobSystem::InitializeWorkerThreads() {
 }
 
 /*
-* Schedules a job by passing the work to a free workerthread
+* Schedules a job by passing the work to a workerthread
+* Momentarily jobs are assigned to worker threads by corresponding index from when they are added.
+* Future implementation should consider the current work load of each worker thread.
+* Dividing jobs over workerthreads reduces the amount of job stealing individual worker threads need to do.
+* See SJSL:: WorkerThread class
 */
 void SJSL::JobSystem::Schedule(std::function<void()> job) {
 
