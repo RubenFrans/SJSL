@@ -20,7 +20,11 @@ void PrintNumber(int number) {
 TEST_CASE("Initializing the job system") {
 
 	SJSL::JobSystem js{};
-	js.Schedule([] { PrintNumber(1); });
+	//js.Schedule([] { PrintNumber(1); });
+
+	SJSL::Job job{ [] { PrintNumber(1); } };
+
+	js.Schedule(job);
 }
 
 TEST_CASE("Correct default amount of WorkerThread initialization") {
@@ -34,4 +38,15 @@ TEST_CASE("Correct custom amount of Workerthread initialization") {
 	uint32_t amountOfWorkerThreads{ 10 };
 	SJSL::JobSystem js{ amountOfWorkerThreads, false };
 	REQUIRE(js.GetAmountOfWorkerThreads() == amountOfWorkerThreads);
+}
+
+
+TEST_CASE("Waiting on a specific job") {
+
+	SJSL::JobSystem js{};
+	SJSL::Job job{ []() { PrintNumber(1); } };
+	js.Schedule(job);
+	std::cout << "Waiting for job to finish" << std::endl;
+	//job.Join();
+
 }

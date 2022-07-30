@@ -42,14 +42,18 @@ void SJSL::JobSystem::InitializeWorkerThreads() {
 * Dividing jobs over workerthreads reduces the amount of job stealing individual worker threads need to do.
 * See SJSL:: WorkerThread class
 */
-void SJSL::JobSystem::Schedule(std::function<void()> job) {
+void SJSL::JobSystem::Schedule(const std::function<void()>& work) {
 
+	Schedule(SJSL::Job{ work });
+
+}
+
+void SJSL::JobSystem::Schedule(const SJSL::Job& job) {
 	m_WorkerThreads[m_AssignCounter]->Assign(job);
 	m_AssignCounter++;
 
 	if (m_AssignCounter > m_AmountOfWorkers - 1)
 		m_AssignCounter = 0;
-
 }
 
 uint32_t SJSL::JobSystem::GetAmountOfWorkerThreads() {

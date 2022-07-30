@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <functional>
+#include "Job.h"
 
 namespace SJSL {
 
@@ -28,7 +29,8 @@ namespace SJSL {
 		JobSystem& operator=(const JobSystem&) = delete; // Copy assignment
 		JobSystem& operator=(const JobSystem&&) = delete; // Move assignment
 
-		void Schedule(std::function<void()> job);
+		void Schedule(const std::function<void()>& work);
+		void Schedule(const SJSL::Job& job);
 
 		uint32_t GetAmountOfWorkerThreads();
 

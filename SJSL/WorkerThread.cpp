@@ -39,7 +39,12 @@ void SJSL::WorkerThread::Join() {
 }
 
 
-void SJSL::WorkerThread::Assign(std::function<void()> job, bool isLocalJob) {
+void SJSL::WorkerThread::Assign(const std::function<void()>& work, bool isLocalJob) {
+
+	Assign(Job{ work });
+}
+
+void SJSL::WorkerThread::Assign(const SJSL::Job& job, bool isLocalJob) {
 
 	std::unique_lock<std::mutex> lock(m_LocalJobMutex);
 
@@ -53,6 +58,7 @@ void SJSL::WorkerThread::Assign(std::function<void()> job, bool isLocalJob) {
 
 	// Notify that the thread can't be killed because there are jobs in the local queue
 	m_JoinThreadCondition.notify_all();
+
 }
 
 
@@ -92,7 +98,7 @@ void SJSL::WorkerThread::ProcessJobs() {
 		localLock.unlock();
 		
 		
-		job();
+		job.Execute();
 
 	}
 }
