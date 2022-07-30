@@ -30,7 +30,7 @@ namespace SJSL {
 		JobSystem& operator=(const JobSystem&&) = delete; // Move assignment
 
 		void Schedule(const std::function<void()>& work);
-		void Schedule(const SJSL::Job& job);
+		void Schedule(SJSL::Job* pJob);
 
 		uint32_t GetAmountOfWorkerThreads();
 

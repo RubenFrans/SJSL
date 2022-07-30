@@ -44,12 +44,11 @@ void SJSL::JobSystem::InitializeWorkerThreads() {
 */
 void SJSL::JobSystem::Schedule(const std::function<void()>& work) {
 
-	Schedule(SJSL::Job{ work });
-
+	Schedule(new SJSL::Job{ work, true });
 }
 
-void SJSL::JobSystem::Schedule(const SJSL::Job& job) {
-	m_WorkerThreads[m_AssignCounter]->Assign(job);
+void SJSL::JobSystem::Schedule(SJSL::Job* pJob) {
+	m_WorkerThreads[m_AssignCounter]->Assign(pJob);
 	m_AssignCounter++;
 
 	if (m_AssignCounter > m_AmountOfWorkers - 1)

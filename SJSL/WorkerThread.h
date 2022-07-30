@@ -40,7 +40,7 @@ namespace SJSL {
 		WorkerThread& operator=(const WorkerThread&&) = delete; // Move assignment
 
 		void Assign(const std::function<void()>& job, bool isLocalJob = true); // Assign a job to the worker thread
-		void Assign(const SJSL::Job& job, bool isLocalJob = true);
+		void Assign(Job* pJob, bool isLocalJob = true);
 		void Join();
 
 		int GetAmountOfLocalJobs();
@@ -51,8 +51,8 @@ namespace SJSL {
 		void ProcessJobs();
 
 		WorkerStatus m_WorkerStatus;
-		std::list<SJSL::Job> m_LocalJobs; // Other workers CANNOT steal from this list
-		std::list<SJSL::Job> m_GlobalJobs; // Other workers can steal from this list to improve load ballancing
+		std::list<SJSL::Job*> m_LocalJobs; // Other workers CANNOT steal from this list
+		std::list<SJSL::Job*> m_GlobalJobs; // Other workers can steal from this list to improve load ballancing
 
 		bool m_KillWorkerThread;
 

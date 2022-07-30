@@ -41,19 +41,19 @@ void SJSL::WorkerThread::Join() {
 
 void SJSL::WorkerThread::Assign(const std::function<void()>& work, bool isLocalJob) {
 
-	Assign(Job{ work });
+	Assign(new Job{ work, true });
 }
 
-void SJSL::WorkerThread::Assign(const SJSL::Job& job, bool isLocalJob) {
+void SJSL::WorkerThread::Assign(Job* pJob, bool isLocalJob) {
 
 	std::unique_lock<std::mutex> lock(m_LocalJobMutex);
 
 	if (!isLocalJob) {
-		m_GlobalJobs.emplace_back(job);
+		m_GlobalJobs.emplace_back(pJob);
 		return;
 	}
 
-	m_LocalJobs.emplace_back(job);
+	m_LocalJobs.emplace_back(pJob);
 	m_ProcessJobsCondition.notify_all();
 
 	// Notify that the thread can't be killed because there are jobs in the local queue
@@ -87,18 +87,24 @@ void SJSL::WorkerThread::ProcessJobs() {
 		if (m_KillWorkerThread)
 			break;
 
-		auto job = m_LocalJobs.front();
+		SJSL::Job* job = m_LocalJobs.front();
 		m_LocalJobs.pop_front();
 
-		// If local jobs are exausted notify that the thread can be killed
-		if (m_LocalJobs.empty())
-			m_JoinThreadCondition.notify_all();
+
 		
 		// Unlock before start executing the job
 		localLock.unlock();
 		
 		
-		job.Execute();
+		job->Execute();
+
+		if (job->RunsDetached()) {
+			delete job;
+		}
+
+		// If local jobs are exausted notify that the thread can be killed
+		if (m_LocalJobs.empty())
+			m_JoinThreadCondition.notify_all();
 
 	}
 }

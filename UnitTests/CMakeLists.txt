@@ -19,6 +19,12 @@ target_link_libraries(UnitTests PRIVATE SJSLib Catch2::Catch2WithMain)
 target_include_directories(UnitTests PUBLIC ${SJSLIncDir})
 target_link_libraries(UnitTests PUBLIC SJSLib)
 
+target_include_directories(UnitTests PUBLIC "${CMAKE_SOURCE_DIR}/include/vld")
+
+set(VLD_LIBRARIES "${CMAKE_SOURCE_DIR}/lib/vld/x64/vld.lib")
+
+target_link_libraries(UnitTests PUBLIC ${VLD_LIBRARIES})
+
 add_custom_target(UnitTestsRun
   COMMAND UnitTests -d yes
   COMMENT "Running SJSL Tests"
