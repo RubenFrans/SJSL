@@ -50,6 +50,7 @@ void SJSL::WorkerThread::Assign(Job* pJob, bool isLocalJob) {
 
 	if (!isLocalJob) {
 		m_GlobalJobs.emplace_back(pJob);
+		m_ProcessJobsCondition.notify_all();
 		return;
 	}
 

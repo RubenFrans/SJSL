@@ -4,7 +4,6 @@
 * This file tests the interface of the SJSL::WorkerThread class
 */
 
-#define CATCH_CONFIG_MAIN
 #include "catch2\catch_all.hpp"
 #include "WorkerThread.h"
 #include <iostream>
@@ -13,7 +12,7 @@
 TEST_CASE("Assigning a local job to WorkerThread") {
 
 	SJSL::WorkerThread* worker{ new SJSL::WorkerThread{} };
-	
+
 	int amountOfJobs{ 8 };
 
 	for (int i = 0; i < amountOfJobs; i++)

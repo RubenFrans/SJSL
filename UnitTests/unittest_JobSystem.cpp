@@ -9,6 +9,7 @@
 #include "vld.h"
 
 #include "JobSystem.h"
+#include "WorkerThread.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -86,3 +87,4 @@ TEST_CASE("Scheduling detached jobs explicitly") {
 	js.Schedule(job1);
 	js.Schedule(job2);
 }
+
