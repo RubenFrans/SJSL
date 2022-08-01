@@ -1,5 +1,5 @@
 # SJSL - Simple Job System Library
-SJSL is a small library aimed to provide a simple jobsystem for use in game- and rendering engines. 
+SJSL is a small library aimed to provide a simple jobsystem for use in game- and rendering engines. It makes it easy to offload work to other threads and tries to take advantage of all cores of a modern CPU by autobalancing the jobs across the workerthreads. 
 
 ## Showcase
 As a real world use case I used my Software Raytracer as a base which I wanted to improve by dividing the rendering of a frame across multiple threads.
