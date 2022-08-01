@@ -36,17 +36,22 @@ void SJSL::JobSystem::InitializeWorkerThreads() {
 }
 
 /*
-* Schedules a job by passing the work to a workerthread
+* Schedules a job by creating a job and passing it to a workerthread
+*/
+void SJSL::JobSystem::Schedule(const std::function<void()>& work) {
+	SJSL::Job* job = new SJSL::Job{ work };
+	job->SetDetached(true);
+	Schedule(job);
+}
+
+/*
+* Schedules a job by passing the job to a workerthread
 * Momentarily jobs are assigned to worker threads by corresponding index from when they are added.
 * Future implementation should consider the current work load of each worker thread.
 * Dividing jobs over workerthreads reduces the amount of job stealing individual worker threads need to do.
-* See SJSL:: WorkerThread class
+* See SJSL:: WorkerThread class 
+* Scheduling directly using a job pointer provides the user to reuse jobs without needing to recreate them, but they'll have to clean up the job themself.
 */
-void SJSL::JobSystem::Schedule(const std::function<void()>& work) {
-
-	Schedule(new SJSL::Job{ work, true });
-}
-
 void SJSL::JobSystem::Schedule(SJSL::Job* pJob) {
 	m_WorkerThreads[m_AssignCounter]->Assign(pJob);
 	m_AssignCounter++;

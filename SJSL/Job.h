@@ -15,7 +15,8 @@ namespace SJSL {
 	class Job
 	{
 	public:
-		Job(const std::function<void(void)>& work, bool runDetached = true);
+
+		Job(const std::function<void(void)>& work);
 		virtual ~Job() = default;
 
 		Job(const Job&) = default; // Copy constructor
@@ -23,10 +24,16 @@ namespace SJSL {
 		Job& operator=(const Job&) = default; // Copy assignment
 		Job& operator=(const Job&&) = delete; // Move assignment
 
-		void Execute();
 		void Join();
-		JobStatus GetJobStatus();
-		bool RunsDetached();
+		JobStatus GetJobStatus() const;
+
+		void SetDetached(bool runDetached);
+		void Execute();
+		bool RunsDetached() const;
+		void Reset();
+
+	protected:
+
 
 	private:
 		std::function<void(void)> m_Work;

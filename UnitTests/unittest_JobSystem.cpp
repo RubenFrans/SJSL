@@ -36,7 +36,7 @@ TEST_CASE("Correct custom amount of Workerthread initialization") {
 TEST_CASE("Scheduling and waiting for a job") {
 
 	SJSL::JobSystem js{};
-	SJSL::Job* job{ new SJSL::Job{ [] { PrintNumber(1); }, false } };
+	SJSL::Job* job{ new SJSL::Job{ [] { PrintNumber(1); } } };
 
 	js.Schedule(job);
 
@@ -47,12 +47,12 @@ TEST_CASE("Scheduling and waiting for a job") {
 
 }
 
-TEST_CASE("Scheduling and waiting for multiple jobs") {
+TEST_CASE("Scheduling and waiting for multiple self managed jobs") {
 
 	SJSL::JobSystem js{};
-	SJSL::Job* job{ new SJSL::Job{ [] { PrintNumber(1); }, false } };
-	SJSL::Job* job1{ new SJSL::Job{ [] { PrintNumber(2); } , false } };
-	SJSL::Job* job2{ new SJSL::Job{ [] { PrintNumber(3); } , false } };
+	SJSL::Job* job{ new SJSL::Job{ [] { PrintNumber(1); } } };
+	SJSL::Job* job1{ new SJSL::Job{ [] { PrintNumber(2); } } };
+	SJSL::Job* job2{ new SJSL::Job{ [] { PrintNumber(3); } } };
 
 	js.Schedule(job);
 	js.Schedule(job1);
@@ -69,22 +69,51 @@ TEST_CASE("Scheduling and waiting for multiple jobs") {
 }
 
 
-TEST_CASE("Scheduling detached jobs implicitly") {
+TEST_CASE("Scheduling detached jobs") {
 	SJSL::JobSystem js{};
 	js.Schedule( [] { PrintNumber(1); });
 	js.Schedule( [] { PrintNumber(2); });
 	js.Schedule( [] { PrintNumber(3); });
 }
 
-TEST_CASE("Scheduling detached jobs explicitly") {
+TEST_CASE("Reusing a non detached job") {
 
 	SJSL::JobSystem js{};
-	SJSL::Job* job{ new SJSL::Job{ [] { PrintNumber(1); } , true } };
-	SJSL::Job* job1{ new SJSL::Job{ [] { PrintNumber(2); } , true } };
-	SJSL::Job* job2{ new SJSL::Job{ [] { PrintNumber(3); } , true } };
+	SJSL::Job* job{ new SJSL::Job{ [] { PrintNumber(1); } } };
+	SJSL::Job* job1{ new SJSL::Job{ [] { PrintNumber(2); } } };
+	SJSL::Job* job2{ new SJSL::Job{ [] { PrintNumber(3); } } };
 
 	js.Schedule(job);
 	js.Schedule(job1);
 	js.Schedule(job2);
+
+	job->Join();
+	job1->Join();
+	job2->Join();
+
+	REQUIRE(job->GetJobStatus() == SJSL::JobStatus::complete);
+	REQUIRE(job1->GetJobStatus() == SJSL::JobStatus::complete);
+	REQUIRE(job2->GetJobStatus() == SJSL::JobStatus::complete);
+
+	job->Reset();
+	job1->Reset();
+	job2->Reset();
+
+	REQUIRE(job->GetJobStatus() == SJSL::JobStatus::unassigned);
+	REQUIRE(job1->GetJobStatus() == SJSL::JobStatus::unassigned);
+	REQUIRE(job2->GetJobStatus() == SJSL::JobStatus::unassigned);
+
+	js.Schedule(job);
+	js.Schedule(job1);
+	js.Schedule(job2);
+
+	job->Join();
+	job1->Join();
+	job2->Join();
+
+	REQUIRE(job->GetJobStatus() == SJSL::JobStatus::complete);
+	REQUIRE(job1->GetJobStatus() == SJSL::JobStatus::complete);
+	REQUIRE(job2->GetJobStatus() == SJSL::JobStatus::complete);
+
 }
 

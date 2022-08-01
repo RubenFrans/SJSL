@@ -41,7 +41,7 @@ void SJSL::WorkerThread::Join() {
 
 void SJSL::WorkerThread::Assign(const std::function<void()>& work, bool isLocalJob) {
 
-	Assign(new Job{ work, true });
+	Assign(new Job{ work });
 }
 
 void SJSL::WorkerThread::Assign(Job* pJob, bool isLocalJob) {

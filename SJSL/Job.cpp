@@ -1,10 +1,10 @@
 #include "Job.h"
 #include <iostream>
 
-SJSL::Job::Job(const std::function<void(void)>& work, bool runDetached)
+SJSL::Job::Job(const std::function<void(void)>& work)
 	: m_Work{ work }
 	, m_Status{ SJSL::JobStatus::unassigned }
-	, m_RunDetached{ runDetached }
+	, m_RunDetached{ false }
 	, m_JoinMutex{}
 	, m_JoinCondition{}
 {
@@ -47,11 +47,26 @@ void SJSL::Job::Join() {
 		});
 }
 
-SJSL::JobStatus SJSL::Job::GetJobStatus() {
+SJSL::JobStatus SJSL::Job::GetJobStatus() const {
 
 	return m_Status;
 }
 
-bool SJSL::Job::RunsDetached() {
+void SJSL::Job::SetDetached(bool runDetached) {
+	m_RunDetached = runDetached;
+}
+
+bool SJSL::Job::RunsDetached() const {
 	return m_RunDetached;
+}
+
+/*
+* Resets the job status to unassigned
+* This is used if you want to run the same job multiple times without needing to recreate jobs
+* This is only possible when the job wasn't scheduled as a detached job because it would be deleted and cause a dangling pointer
+*/
+void SJSL::Job::Reset() {	
+	if (!m_RunDetached) {
+		m_Status = SJSL::JobStatus::unassigned;
+	}
 }
