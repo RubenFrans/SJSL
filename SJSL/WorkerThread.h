@@ -43,8 +43,8 @@ namespace SJSL {
 		void Assign(Job* pJob, bool isLocalJob = true);
 		void Join();
 
-		int GetAmountOfLocalJobs();
-		int GetAmountOfGlobalJobs();
+		size_t GetAmountOfLocalJobs() const;
+		size_t GetAmountOfGlobalJobs() const;
 
 	private:
 

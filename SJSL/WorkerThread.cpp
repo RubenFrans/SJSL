@@ -22,7 +22,6 @@ SJSL::WorkerThread::~WorkerThread() {
 /*
 * Before joining the worker thread we make sure all it's jobs are finished
 * This makes sure no work is abandoned when the jobsystem is terminated prematurely (happens in small unit tests or applications)
-* Future implementation should have jobs that are interuptable.
 */
 void SJSL::WorkerThread::Join() {
 
@@ -110,13 +109,13 @@ void SJSL::WorkerThread::ProcessJobs() {
 	}
 }
 
-int SJSL::WorkerThread::GetAmountOfLocalJobs() {
+size_t SJSL::WorkerThread::GetAmountOfLocalJobs() const {
 
 	return m_LocalJobs.size();
 
 }
 
-int SJSL::WorkerThread::GetAmountOfGlobalJobs() {
+size_t SJSL::WorkerThread::GetAmountOfGlobalJobs() const {
 
 	return m_GlobalJobs.size();
 

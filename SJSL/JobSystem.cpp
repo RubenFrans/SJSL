@@ -60,7 +60,7 @@ void SJSL::JobSystem::Schedule(SJSL::Job* pJob) {
 		m_AssignCounter = 0;
 }
 
-uint32_t SJSL::JobSystem::GetAmountOfWorkerThreads() {
+uint32_t SJSL::JobSystem::GetAmountOfWorkerThreads() const {
 
 	return m_AmountOfWorkers;
 

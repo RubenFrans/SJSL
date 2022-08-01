@@ -32,7 +32,7 @@ namespace SJSL {
 		void Schedule(const std::function<void()>& work);
 		void Schedule(SJSL::Job* pJob);
 
-		uint32_t GetAmountOfWorkerThreads();
+		uint32_t GetAmountOfWorkerThreads() const;
 
 	private:
 		void InitializeWorkerThreads();
