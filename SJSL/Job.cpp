@@ -11,6 +11,9 @@ SJSL::Job::Job(const std::function<void(void)>& work, bool runDetached)
 
 }
 
+/*
+* Executes job and notifies other threads that might be waiting for this job to finish.
+*/
 void SJSL::Job::Execute()
 {
 	m_Status = SJSL::JobStatus::working;
@@ -25,9 +28,14 @@ void SJSL::Job::Execute()
 	}
 
 	m_Status = SJSL::JobStatus::complete;
-	m_JoinCondition.notify_all();
+	m_JoinCondition.notify_all(); 
 }
 
+/*
+* Used to synchronize a job with another thread.
+* If you need to be sure that a job is finished before continueing code execution
+* E.g. Before switching the front and backbuffer you should join all render jobs.
+*/
 void SJSL::Job::Join() {
 
 	std::unique_lock joinLock{ m_JoinMutex };
