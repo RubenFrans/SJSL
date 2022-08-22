@@ -47,6 +47,10 @@ void SJSL::WorkerThread::Assign(Job* pJob, bool isLocalJob) {
 
 	std::unique_lock<std::mutex> lock(m_LocalJobMutex);
 
+	/*
+	* No locking is yet in place for the globel queue, placeholder code as it is not supported yet
+	* Currently jobs are always assigned to the localqueue by a the default value of isLocalJob
+	*/
 	if (!isLocalJob) {
 		m_GlobalJobs.emplace_back(pJob);
 		m_ProcessJobsCondition.notify_all();

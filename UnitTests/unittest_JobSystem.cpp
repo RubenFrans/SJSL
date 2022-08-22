@@ -117,3 +117,11 @@ TEST_CASE("Reusing a non detached job") {
 
 }
 
+
+TEST_CASE("Running a detached job using bind") {
+
+	SJSL::JobSystem js{};
+
+	js.Schedule(std::bind(&PrintNumber, 1));
+
+}
