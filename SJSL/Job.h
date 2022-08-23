@@ -39,7 +39,7 @@ namespace SJSL {
 		std::function<void(void)> m_Work;
 		JobStatus m_Status;
 		bool m_RunDetached;
-		std::mutex m_JoinMutex{};
+		std::mutex m_JobMutex{};
 		std::condition_variable m_JoinCondition;
 	};
 }

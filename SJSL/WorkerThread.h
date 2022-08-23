@@ -26,7 +26,7 @@ namespace SJSL {
 		pending // Worker has pending jobs but is not currently working on them
 	};
 
-	class WorkerThread
+	class WorkerThread final
 	{
 
 	public:
@@ -49,6 +49,10 @@ namespace SJSL {
 	private:
 
 		void ProcessJobs();
+		void ProcessLocalJob();
+		void ProcessGlobalJob();
+		void AssignJobToLocalQueue(Job* pJob);
+		void AssignJobToGlobalQueue(Job* pJob);
 
 		WorkerStatus m_WorkerStatus;
 		std::list<SJSL::Job*> m_LocalJobs; // Other workers CANNOT steal from this list

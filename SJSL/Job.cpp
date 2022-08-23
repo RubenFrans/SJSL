@@ -5,7 +5,7 @@ SJSL::Job::Job(const std::function<void(void)>& work)
 	: m_Work{ work }
 	, m_Status{ SJSL::JobStatus::unassigned }
 	, m_RunDetached{ false }
-	, m_JoinMutex{}
+	, m_JobMutex{}
 	, m_JoinCondition{}
 {
 
@@ -16,6 +16,7 @@ SJSL::Job::Job(const std::function<void(void)>& work)
 */
 void SJSL::Job::Execute()
 {
+	std::unique_lock<std::mutex>(m_JobMutex);
 	m_Status = SJSL::JobStatus::working;
 
 	if (m_Work) {
@@ -38,7 +39,7 @@ void SJSL::Job::Execute()
 */
 void SJSL::Job::Join() {
 
-	std::unique_lock joinLock{ m_JoinMutex };
+	std::unique_lock joinLock{ m_JobMutex };
 
 	m_JoinCondition.wait(joinLock, [&]() {
 
@@ -48,11 +49,11 @@ void SJSL::Job::Join() {
 }
 
 SJSL::JobStatus SJSL::Job::GetJobStatus() const {
-
 	return m_Status;
 }
 
 void SJSL::Job::SetDetached(bool runDetached) {
+	std::unique_lock<std::mutex>(m_JobMutex);
 	m_RunDetached = runDetached;
 }
 
@@ -66,6 +67,7 @@ bool SJSL::Job::RunsDetached() const {
 * This is only possible when the job wasn't scheduled as a detached job because it would be deleted and cause a dangling pointer
 */
 void SJSL::Job::Reset() {	
+	std::unique_lock<std::mutex>(m_JobMutex);
 	if (!m_RunDetached) {
 		m_Status = SJSL::JobStatus::unassigned;
 	}

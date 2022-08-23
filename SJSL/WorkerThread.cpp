@@ -45,24 +45,41 @@ void SJSL::WorkerThread::Assign(const std::function<void()>& work, bool isLocalJ
 
 void SJSL::WorkerThread::Assign(Job* pJob, bool isLocalJob) {
 
+	if (!isLocalJob) {
+		AssignJobToGlobalQueue(pJob);
+	}
+	else {
+		AssignJobToLocalQueue(pJob);
+	}
+}
+
+/*
+* Handles Assigning a job to the local jobqueue of the worker thread
+*/
+void SJSL::WorkerThread::AssignJobToLocalQueue(Job* pJob) {
+
 	std::unique_lock<std::mutex> lock(m_LocalJobMutex);
 
-	/*
-	* No locking is yet in place for the globel queue, placeholder code as it is not supported yet
-	* Currently jobs are always assigned to the localqueue by a the default value of isLocalJob
-	*/
-	if (!isLocalJob) {
-		m_GlobalJobs.emplace_back(pJob);
-		m_ProcessJobsCondition.notify_all();
-		return;
-	}
-
 	m_LocalJobs.emplace_back(pJob);
+	m_ProcessJobsCondition.notify_all();
+	
+	// Notify that the thread can't be killed because there are jobs in the local queue
+	m_JoinThreadCondition.notify_all();
+}
+
+
+/*
+* Handles Assigning a job to the global jobqueue of the worker thread
+*/
+void SJSL::WorkerThread::AssignJobToGlobalQueue(Job* pJob) {
+	
+	std::unique_lock<std::mutex> lock(m_GlobalJobMutex);
+
+	m_GlobalJobs.emplace_back(pJob);
 	m_ProcessJobsCondition.notify_all();
 
 	// Notify that the thread can't be killed because there are jobs in the local queue
 	m_JoinThreadCondition.notify_all();
-
 }
 
 
@@ -95,10 +112,8 @@ void SJSL::WorkerThread::ProcessJobs() {
 		m_LocalJobs.pop_front();
 
 
-		
 		// Unlock before start executing the job
 		localLock.unlock();
-		
 		
 		job->Execute();
 
@@ -113,14 +128,24 @@ void SJSL::WorkerThread::ProcessJobs() {
 	}
 }
 
+void SJSL::WorkerThread::ProcessLocalJob() {
+
+}
+
+void SJSL::WorkerThread::ProcessGlobalJob() {
+
+}
+
 size_t SJSL::WorkerThread::GetAmountOfLocalJobs() const {
 
+	std::unique_lock<std::mutex>(m_LocalJobMutex);
 	return m_LocalJobs.size();
 
 }
 
 size_t SJSL::WorkerThread::GetAmountOfGlobalJobs() const {
 
+	std::unique_lock<std::mutex>(m_GlobalJobMutex);
 	return m_GlobalJobs.size();
 
 }
