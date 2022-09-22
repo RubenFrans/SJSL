@@ -19,10 +19,10 @@ namespace SJSL {
 		Job(const std::function<void(void)>& work);
 		virtual ~Job() = default;
 
-		Job(const Job&) = default; // Copy constructor
-		Job(Job&&) = delete; // Move constructor
-		Job& operator=(const Job&) = default; // Copy assignment
-		Job& operator=(const Job&&) = delete; // Move assignment
+		Job(const Job&) = default; 
+		Job(Job&&) = delete; 
+		Job& operator=(const Job&) = default;
+		Job& operator=(const Job&&) = delete;
 
 		void Join();
 		JobStatus GetJobStatus() const;
