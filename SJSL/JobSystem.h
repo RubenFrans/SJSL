@@ -25,7 +25,6 @@ namespace SJSL {
 		~JobSystem();
 
 		JobSystem(const JobSystem&) = delete;
-		tor
 		JobSystem(JobSystem&&) = delete;
 		JobSystem& operator=(const JobSystem&) = delete;
 		JobSystem& operator=(const JobSystem&&) = delete;
