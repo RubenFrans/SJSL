@@ -31,6 +31,7 @@ namespace SJSL {
 		void Execute();
 		bool RunsDetached() const;
 		void Reset();
+		void MarkAssigned();
 
 	protected:
 

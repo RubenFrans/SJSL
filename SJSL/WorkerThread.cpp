@@ -1,4 +1,5 @@
 #include "WorkerThread.h"
+#include "QuickLogger.h"
 
 SJSL::WorkerThread::WorkerThread()
 	: m_WorkerStatus{ WorkerStatus::idle }
@@ -15,8 +16,13 @@ SJSL::WorkerThread::WorkerThread()
 */
 SJSL::WorkerThread::~WorkerThread() {
 
+	QuickLogger::GetInstance().Log("Worker: Destructor called joining workerthread");
+	
 	if(m_JobThread.joinable())
 		Join();
+
+	QuickLogger::GetInstance().Log("Worker: Destructor finished");
+
 }
 
 /*
@@ -24,6 +30,8 @@ SJSL::WorkerThread::~WorkerThread() {
 * This makes sure no work is abandoned when the jobsystem is terminated prematurely (happens in small unit tests or applications)
 */
 void SJSL::WorkerThread::Join() {
+
+	QuickLogger::GetInstance().Log("Worker: Joining worker");
 
 	std::unique_lock joinLock{ m_JoinThreadMutex };
 	m_JoinThreadCondition.wait(joinLock, [&]() {
@@ -35,6 +43,8 @@ void SJSL::WorkerThread::Join() {
 	m_KillWorkerThread = true;
 	m_ProcessJobsCondition.notify_all();
 	m_JobThread.join();
+
+	QuickLogger::GetInstance().Log("Worker: Done joining worker");
 }
 
 
@@ -44,6 +54,10 @@ void SJSL::WorkerThread::Assign(const std::function<void()>& work, bool isLocalJ
 }
 
 void SJSL::WorkerThread::Assign(Job* pJob, bool isLocalJob) {
+
+
+
+	pJob->MarkAssigned();
 
 	if (!isLocalJob) {
 		AssignJobToGlobalQueue(pJob);
@@ -58,6 +72,8 @@ void SJSL::WorkerThread::Assign(Job* pJob, bool isLocalJob) {
 */
 void SJSL::WorkerThread::AssignJobToLocalQueue(Job* pJob) {
 
+	QuickLogger::GetInstance().Log("Worker: Assinging job to local queue");
+
 	std::unique_lock<std::mutex> lock(m_LocalJobMutex);
 
 	m_LocalJobs.emplace_back(pJob);
@@ -65,6 +81,8 @@ void SJSL::WorkerThread::AssignJobToLocalQueue(Job* pJob) {
 	
 	// Notify that the thread can't be killed because there are jobs in the local queue
 	m_JoinThreadCondition.notify_all();
+	
+	QuickLogger::GetInstance().Log("Worker: Assingin job to localqueue");
 }
 
 
@@ -73,6 +91,8 @@ void SJSL::WorkerThread::AssignJobToLocalQueue(Job* pJob) {
 */
 void SJSL::WorkerThread::AssignJobToGlobalQueue(Job* pJob) {
 	
+	QuickLogger::GetInstance().Log("Worker: Assinging job to global queue");
+	
 	std::unique_lock<std::mutex> lock(m_GlobalJobMutex);
 
 	m_GlobalJobs.emplace_back(pJob);
@@ -80,6 +100,8 @@ void SJSL::WorkerThread::AssignJobToGlobalQueue(Job* pJob) {
 
 	// Notify that the thread can't be killed because there are jobs in the local queue
 	m_JoinThreadCondition.notify_all();
+
+	QuickLogger::GetInstance().Log("Worker: Assingin job to global queue");
 }
 
 
