@@ -35,7 +35,7 @@ There is no need to cleanup jobs yourself, because of the use of shared pointers
 SJSL::JobSystem js{};
 
 // Creating the job
-SJSL::Job* job{ new SJSL::Job{ [] { PrintNumber(1); } } };
+std::shared_ptr<SJSL::Job> job = std::make_shared<SJSL::Job>( [] { PrintNumber(1); } );
 
 // Do other stuff
 //.. 
@@ -52,7 +52,7 @@ The jobsystem will return a shared pointer to the job you can use to synchronize
 SJSL::JobSystem js{};
 
 // Scheduling a job from a lamda
-js.Schedule( [] { std::cout << "Hello from thread: " << std::this_thread::get_id() << std::endl; });
+js.Schedule( [] { PrintNumber(1); });
 
 // Scheduling a job using bind
 js.Schedule(std::bind(&PrintNumber, 1));
@@ -68,16 +68,16 @@ SJSL::JobSystem js{};
 ```C++
 void Elite::Renderer::InitializeRenderJobs() {
 	
-	m_RenderJobs = std::vector<SJSL::Job*>{};
+	m_RenderJobs = std::vector<std::shared_ptr<SJSL::Job>>{};
 	
 	for (uint32_t r = 0; r < m_Height; r += m_RenderRowstep)
 	{
 		for (int i = 0; i < m_AmountOfCores; i++)
 		{
 
-			m_RenderJobs.push_back(new SJSL::Job{ std::bind(&Camera::CalculatePixelBatch, m_Camera, 0
+			m_RenderJobs.emplace_back(std::make_shared<SJSL::Job>( std::bind(&Camera::CalculatePixelBatch, m_Camera, 0
 				, r + m_RenderBatchRowAmount * i, m_RenderBatchRowAmount
-				, m_Width, m_Height, m_pBackBufferPixels, m_pBackBuffer) });
+				, m_Width, m_Height, m_pBackBufferPixels, m_pBackBuffer) ));
 
 		}
 	}
@@ -106,12 +106,12 @@ void Elite::Renderer::Render(float totalTime,float deltaT)
 ```C++
 void Elite::Renderer::ScheduleRenderJobs() {
 
-	for (SJSL::Job* job : m_RenderJobs) {
+	for (std::shared_ptr<SJSL::Job> job : m_RenderJobs) {
 		job->Reset();
 		m_JobSystem.Schedule(job);
 	}
 
-	for (SJSL::Job* job : m_RenderJobs) {
+	for (std::shared_ptr<SJSL::Job> job : m_RenderJobs) {
 
 		job->Join();
 	}
