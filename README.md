@@ -118,4 +118,4 @@ void Elite::Renderer::ScheduleRenderJobs() {
 }
 ````
 ### Job cleanup
-There is no need to cleanup jobs yourself, because of the use of shared pointers, the jobs will be automatically deleted once all references are gone.
+There is no need to cleanup jobs yourself, because of the use of shared pointers, the jobs will be automatically deleted once all references are out of scope.
