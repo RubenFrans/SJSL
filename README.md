@@ -5,7 +5,7 @@ SJSL is a small library aimed to provide a simple jobsystem for use in game- and
 As a real world use case I used my Software Raytracer as a base which I wanted to improve by dividing the rendering of a frame across multiple threads.
 
 ![MTRenderer](https://user-images.githubusercontent.com/41028126/182160550-32a92619-2b9f-4ee2-b8e3-5d6c8f996078.gif)
-
+https://github.com/RubenFrans/MultithreadedRaytracer
 Each job renders an horizontal strip of the frame by tracing the rays for those pixels and writing the results to the backbuffer.
 When all jobs that frame are finished the front and backbuffer are flipped to show the new frame. Then the jobs are reused to render the next frame.
 
@@ -22,19 +22,6 @@ When all jobs that frame are finished the front and backbuffer are flipped to sh
 
 ## How to use SJSL
 
-### Running lambda's as jobs
-You can easily run a lambda as a job by just passing the lamda to the JobSystem::Schedule() method.
-The jobsystem will return a shared pointer to the job you can use to synchronize other threads with or if you later need to check the status of the job.
-```C++
-// Initializing the jobsystem
-SJSL::JobSystem js{};
-
-// Scheduling a job from a lamda
-js.Schedule( [] { std::cout << "Hello from thread: " << std::this_thread::get_id() << std::endl; });
-
-// Scheduling a job using bind
-js.Schedule(std::bind(&PrintNumber, 1));
-```
 ### Running jobs
 Another way of running a job is creating a shared pointer to a job yourself and pass it to the jobsystem to execute, you can still use set shared pointer to check the jobs status or to synchronize. E.G. you need to make sure that the job is finished before executing other code.
 For example rendering a frame across multiple cores and synchronizing before flipping the front and backbuffer.
@@ -52,6 +39,20 @@ SJSL::Job* job{ new SJSL::Job{ [] { PrintNumber(1); } } };
 // Synchronizing the job with the current thread
 job2->Join();
 ````
+
+### Running lambda's as jobs
+You can easily run a lambda as a job by just passing the lamda to the JobSystem::Schedule() method.
+The jobsystem will return a shared pointer to the job you can use to synchronize other threads with or if you later need to check the status of the job.
+```C++
+// Initializing the jobsystem
+SJSL::JobSystem js{};
+
+// Scheduling a job from a lamda
+js.Schedule( [] { std::cout << "Hello from thread: " << std::this_thread::get_id() << std::endl; });
+
+// Scheduling a job using bind
+js.Schedule(std::bind(&PrintNumber, 1));
+```
 ### A real world example - Rendering a frame of my software raytracer
 
 #### Initializing job system
