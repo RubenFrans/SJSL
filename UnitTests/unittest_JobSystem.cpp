@@ -36,23 +36,22 @@ TEST_CASE("Correct custom amount of Workerthread initialization") {
 TEST_CASE("Scheduling and waiting for a job") {
 
 	SJSL::JobSystem js{};
-	SJSL::Job* job{ new SJSL::Job{ [] { PrintNumber(1); } } };
+	std::shared_ptr<SJSL::Job> job = std::make_shared<SJSL::Job>( [] { PrintNumber(1); } );
 
 	js.Schedule(job);
 
 	std::cout << "Waiting for job to finish" << std::endl;
 	job->Join();
 	std::cout << "Job Finished" << std::endl;
-	delete job;
 
 }
 
 TEST_CASE("Scheduling and waiting for multiple self managed jobs") {
 
 	SJSL::JobSystem js{};
-	SJSL::Job* job{ new SJSL::Job{ [] { PrintNumber(1); } } };
-	SJSL::Job* job1{ new SJSL::Job{ [] { PrintNumber(2); } } };
-	SJSL::Job* job2{ new SJSL::Job{ [] { PrintNumber(3); } } };
+	std::shared_ptr<SJSL::Job> job = std::make_shared<SJSL::Job>( [] { PrintNumber(1); } );
+	std::shared_ptr<SJSL::Job> job1 = std::make_shared<SJSL::Job>( [] { PrintNumber(2); } );
+	std::shared_ptr<SJSL::Job> job2 = std::make_shared<SJSL::Job>( [] { PrintNumber(3); } );
 
 	js.Schedule(job);
 	js.Schedule(job1);
@@ -63,9 +62,6 @@ TEST_CASE("Scheduling and waiting for multiple self managed jobs") {
 	job1->Join();
 	job2->Join();
 	std::cout << "Jobs Finished" << std::endl;
-	delete job;
-	delete job1;
-	delete job2; 
 }
 
 
@@ -79,9 +75,9 @@ TEST_CASE("Scheduling detached jobs") {
 TEST_CASE("Reusing a non detached job") {
 
 	SJSL::JobSystem js{};
-	SJSL::Job* job{ new SJSL::Job{ [] { PrintNumber(1); } } };
-	SJSL::Job* job1{ new SJSL::Job{ [] { PrintNumber(2); } } };
-	SJSL::Job* job2{ new SJSL::Job{ [] { PrintNumber(3); } } };
+	std::shared_ptr<SJSL::Job> job = std::make_shared<SJSL::Job>([] { PrintNumber(1); });
+	std::shared_ptr<SJSL::Job> job1 = std::make_shared<SJSL::Job>([] { PrintNumber(2); });
+	std::shared_ptr<SJSL::Job> job2 = std::make_shared<SJSL::Job>([] { PrintNumber(3); });
 
 	js.Schedule(job);
 	js.Schedule(job1);

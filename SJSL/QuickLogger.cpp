@@ -1,4 +1,4 @@
-#include "QuickLogger.h"
+
 #include <iostream>
 #include <thread>
 
@@ -35,6 +35,7 @@ void QuickLogger::Log(const std::string& logLine) {
 QuickLogger::~QuickLogger() {
 
 	m_OutputFileStream.close();
+	delete m_Instance;
 
 }
 

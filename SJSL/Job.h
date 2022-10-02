@@ -27,9 +27,7 @@ namespace SJSL {
 		void Join();
 		JobStatus GetJobStatus() const;
 
-		void SetDetached(bool runDetached);
 		void Execute();
-		bool RunsDetached() const;
 		void Reset();
 		void MarkAssigned();
 
@@ -39,7 +37,6 @@ namespace SJSL {
 	private:
 		std::function<void(void)> m_Work;
 		JobStatus m_Status;
-		bool m_RunDetached;
 		std::mutex m_JobMutex{};
 		std::condition_variable m_JoinCondition;
 	};

@@ -22,10 +22,9 @@ When all jobs that frame are finished the front and backbuffer are flipped to sh
 
 ## How to use SJSL
 
-### Running detached jobs
-A detached job means running a single use job that you pass to the jobsystem to take care of it. 
-The jobsystem will clean up the job after it has completed.
-The disadvantage of this is that you can't check the status of the job or synchronize it with the main thread. Good writing log files or playing audio.
+### Running lambda's as jobs
+You can easily run a lambda as a job by just passing the lamda to the JobSystem::Schedule() method.
+The jobsystem will return a shared pointer to the job you can use to synchronize other threads with or if you later need to check the status of the job.
 ```C++
 // Initializing the jobsystem
 SJSL::JobSystem js{};
@@ -36,9 +35,10 @@ js.Schedule( [] { std::cout << "Hello from thread: " << std::this_thread::get_id
 // Scheduling a job using bind
 js.Schedule(std::bind(&PrintNumber, 1));
 ```
-### Running attached jobs
-An attached job is a job that is passed to the jobsystem to execute but you still have a handle to set job that you can use to check the jobs status or to synchronize. E.G. you need to make sure that the job is finished before executing other code.
+### Running jobs
+Another way of running a job is creating a shared pointer to a job yourself and pass it to the jobsystem to execute, you can still use set shared pointer to check the jobs status or to synchronize. E.G. you need to make sure that the job is finished before executing other code.
 For example rendering a frame across multiple cores and synchronizing before flipping the front and backbuffer.
+There is no need to cleanup jobs yourself, because of the use of shared pointers, the jobs will be automatically deleted once all references are gone.
 ```C++
 // Initializing the jobsystem
 SJSL::JobSystem js{};
@@ -51,9 +51,6 @@ SJSL::Job* job{ new SJSL::Job{ [] { PrintNumber(1); } } };
 
 // Synchronizing the job with the current thread
 job2->Join();
-
-// cleaning up the job
-delete job;
 ````
 ### A real world example - Rendering a frame of my software raytracer
 
@@ -116,17 +113,4 @@ void Elite::Renderer::ScheduleRenderJobs() {
 }
 ````
 ### Job cleanup
-```C++
-Elite::Renderer::~Renderer()
-{
-  //...
-  
-	// Cleanup render jobs
-	for (SJSL::Job* job : m_RenderJobs) {
-
-		delete job;
-	}
-
-	m_RenderJobs.clear();
-}
-````
+There is no need to cleanup jobs yourself, because of the use of shared pointers, the jobs will be automatically deleted once all references are gone.

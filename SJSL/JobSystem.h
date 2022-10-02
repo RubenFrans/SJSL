@@ -29,8 +29,8 @@ namespace SJSL {
 		JobSystem& operator=(const JobSystem&) = delete;
 		JobSystem& operator=(const JobSystem&&) = delete;
 
-		void Schedule(const std::function<void()>& work);
-		void Schedule(SJSL::Job* pJob);
+		std::shared_ptr<SJSL::Job> Schedule(const std::function<void()>& work);
+		void Schedule(std::shared_ptr<SJSL::Job>& pJob);
 
 		uint32_t GetAmountOfWorkerThreads() const;
 

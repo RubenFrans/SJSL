@@ -15,10 +15,10 @@ TEST_CASE("Assigning a local job to WorkerThread") {
 
 	int amountOfJobs{ 8 };
 
-	for (int i = 0; i < amountOfJobs; i++)
-	{
-		worker->Assign([] { std::this_thread::sleep_for(std::chrono::duration<float, std::milli>(100)); });
-	}
+	//for (int i = 0; i < amountOfJobs; i++)
+	//{
+	//	worker->Assign([] { std::this_thread::sleep_for(std::chrono::duration<float, std::milli>(100)); });
+	//}
 
 	REQUIRE(worker->GetAmountOfLocalJobs() == amountOfJobs);
 
