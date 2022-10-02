@@ -4,8 +4,12 @@ SJSL is a small library aimed to provide a simple jobsystem for use in game- and
 ## Showcase
 As a real world use case I used my Software Raytracer as a base which I wanted to improve by dividing the rendering of a frame across multiple threads.
 
-![MTRenderer](https://user-images.githubusercontent.com/41028126/182160550-32a92619-2b9f-4ee2-b8e3-5d6c8f996078.gif)
+[comment]: <![MTRenderer](https://user-images.githubusercontent.com/41028126/182160550-32a92619-2b9f-4ee2-b8e3-5d6c8f996078.gif)>
+<img src="https://user-images.githubusercontent.com/41028126/182160550-32a92619-2b9f-4ee2-b8e3-5d6c8f996078.gif" width="100%"
+     >
+
 https://github.com/RubenFrans/MultithreadedRaytracer
+
 Each job renders an horizontal strip of the frame by tracing the rays for those pixels and writing the results to the backbuffer.
 When all jobs that frame are finished the front and backbuffer are flipped to show the new frame. Then the jobs are reused to render the next frame.
 
