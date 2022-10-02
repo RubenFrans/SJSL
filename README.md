@@ -15,7 +15,7 @@ When all jobs that frame are finished the front and backbuffer are flipped to sh
 
 ## Features
 - Autobalancing of jobs across threads
-- Automatic cleanup of detached jobs
+- Automatic cleanup of jobs
 - Automatically synchronizes all workerthreads when jobsystem is destroyed
 
 ## WIP features
