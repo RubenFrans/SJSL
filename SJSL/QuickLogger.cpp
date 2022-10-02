@@ -14,12 +14,15 @@ QuickLogger::QuickLogger()
 
 void QuickLogger::SetLoggingEnabled(bool enabled) {
 
-	m_LoggingEnabled = false;
+	m_LoggingEnabled = enabled;
 
 }
 
 
 void QuickLogger::Log(const std::string& logLine) {
+
+	if (!m_LoggingEnabled)
+		return;
 
 	if (!m_OutputFileStream.is_open()) {
 		m_OutputFileStream.open(m_LogFileName);
